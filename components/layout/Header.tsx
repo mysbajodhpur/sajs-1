@@ -94,7 +94,7 @@ export default function Header() {
             </div>
 
             <Link
-              href="/team"
+              href="/teams"
               className={`px-4 py-2 text-gray-700 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all duration-200 font-medium ${
                 isActive('/team') ? 'text-primary-600 bg-primary-50' : ''
               }`}
