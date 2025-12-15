@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { FaGraduationCap, FaHeartbeat, FaOm, FaLeaf, FaEllipsisH, FaBars } from 'react-icons/fa';
-import { useDonate } from '@/context/DonateContext';
+import { useDonate } from '@/context/DonateContext'; 
 
 export default function Header() {
   const pathname = usePathname();
