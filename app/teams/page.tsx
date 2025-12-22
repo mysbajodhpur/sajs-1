@@ -48,7 +48,7 @@ export default function TeamPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
             {teamData.map((member) => (
               <div key={member.id} className="group text-center">
-                <div className="relative w-48 h-48 mx-auto mb-6 rounded-full overflow-hidden border-4 border-primary-100 shadow-lg group-hover:scale-105 transition-transform duration-300">
+                <div className="relative w-48 h-48 mx-auto mb-6 rounded-[20px] overflow-hidden border-4 border-primary-100 shadow-lg group-hover:scale-105 transition-transform duration-300">
                   <Image
                     src={member.image}
                     alt={member.name}

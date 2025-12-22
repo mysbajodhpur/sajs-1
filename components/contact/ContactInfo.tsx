@@ -38,7 +38,7 @@ export default function ContactInfo() {
         </ContactItem>
 
         <ContactItem icon={FaPhone} title="Phone">
-          +91 11 2345 6789<br />+91 98765 43210
+          +91 9828030604
         </ContactItem>
 
         <ContactItem icon={FaEnvelope} title="Email">
