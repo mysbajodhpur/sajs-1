@@ -33,13 +33,9 @@ export default function DonateModal() {
         {/* Content */}
         <div className="p-8">
             {/* QR Code Section */}
-            <div className="text-center mb-8">
+            {/* <div className="text-center mb-8">
                 <div className="inline-block p-4 bg-gray-50 rounded-2xl border border-gray-100 mb-3 shadow-inner">
-                    <FaQrcode className="w-32 h-32 text-gray-300 mx-auto" />
-                    {/* 
-                      TODO: Replace above icon with actual QR Code image using Next/Image
-                      <Image src="/images/upi-qr.png" alt="Donate UPI" width={150} height={150} />
-                    */}
+                    <Image src="/images/upi-qr.png" alt="Donate UPI" width={150} height={150} />
                 </div>
                 <p className="text-gray-500 text-sm font-medium">Scan to Pay via UPI</p>
                 <p className="text-xs text-gray-400 mt-1">GPay / PhonePe / Paytm</p>
@@ -49,7 +45,7 @@ export default function DonateModal() {
                 <div className="flex-grow border-t border-gray-200"></div>
                 <span className="flex-shrink-0 mx-4 text-gray-400 text-sm">OR</span>
                 <div className="flex-grow border-t border-gray-200"></div>
-            </div>
+            </div> */}
 
             {/* Bank Details */}
             <div className="mt-6">
@@ -60,19 +56,19 @@ export default function DonateModal() {
                 <div className="bg-primary-50 rounded-xl p-5 space-y-2 text-sm text-gray-700">
                     <div className="flex justify-between">
                         <span className="text-gray-500">Account Name:</span>
-                        <span className="font-bold">SAJS Foundation</span>
+                        <span className="font-bold">Sewa Avam Jan Sahyog Sansthan</span>
                     </div>
                     <div className="flex justify-between">
                         <span className="text-gray-500">Account Number:</span>
-                        <span className="font-bold font-mono">1234567890123</span>
+                        <span className="font-bold font-mono">83057678472</span>
                     </div>
                     <div className="flex justify-between">
                         <span className="text-gray-500">IFSC Code:</span>
-                        <span className="font-bold font-mono">SBIN0001234</span>
+                        <span className="font-bold font-mono">RMGB0000306</span>
                     </div>
                     <div className="flex justify-between">
                         <span className="text-gray-500">Bank Name:</span>
-                        <span className="font-bold">State Bank of India</span>
+                        <span className="font-bold">Rajasthan Marudhara Gramin Bank</span>
                     </div>
                 </div>
             </div>
