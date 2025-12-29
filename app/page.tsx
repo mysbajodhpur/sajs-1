@@ -70,10 +70,10 @@ export default function Home() {
                   Donate Now
                 </a>
                 <a
-                  href="#campaigns"
+                  href="/about"
                   className="inline-flex items-center justify-center px-6 py-3 bg-white text-primary-600 border-2 border-primary-600 rounded-lg font-semibold hover:bg-primary-50 transition-all duration-200 shadow-md hover:shadow-lg"
                 >
-                  View Campaigns
+                  About Us
                   <FaArrowRight className="ml-2 text-sm" />
                 </a>
               </div>
