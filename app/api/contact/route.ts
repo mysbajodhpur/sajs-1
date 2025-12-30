@@ -31,10 +31,21 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if SMTP credentials are configured
-    if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
-      console.error('SMTP credentials not configured. SMTP_USER:', process.env.SMTP_USER ? 'SET' : 'NOT SET', 'SMTP_PASS:', process.env.SMTP_PASS ? 'SET' : 'NOT SET');
+    const smtpUser = process.env.SMTP_USER;
+    const smtpPass = process.env.SMTP_PASS;
+    const smtpHost = process.env.SMTP_HOST;
+
+    if (!smtpUser || !smtpPass || !smtpHost) {
+      const missing = [];
+      if (!smtpUser) missing.push('SMTP_USER');
+      if (!smtpPass) missing.push('SMTP_PASS');
+      if (!smtpHost) missing.push('SMTP_HOST');
+
+      console.error('Missing environment variables:', missing.join(', '));
+      console.error('All env vars starting with SMTP:', Object.keys(process.env).filter(k => k.includes('SMTP')));
+
       return NextResponse.json(
-        { error: 'Email service is not configured properly' },
+        { error: `Missing configuration: ${missing.join(', ')}. Please redeploy after adding environment variables.` },
         { status: 500 }
       );
     }
