@@ -2,57 +2,97 @@ import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 
 interface ContactFormData {
-    name: string;
-    email: string;
-    phone?: string;
-    message: string;
+  name: string;
+  email: string;
+  phone?: string;
+  message: string;
 }
 
 export async function POST(request: NextRequest) {
+  try {
+    const body: ContactFormData = await request.json();
+    const { name, email, phone, message } = body;
+
+    // Validate required fields
+    if (!name || !email || !message) {
+      return NextResponse.json(
+        { error: 'Name, email, and message are required' },
+        { status: 400 }
+      );
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json(
+        { error: 'Invalid email format' },
+        { status: 400 }
+      );
+    }
+
+    // Check if SMTP credentials are configured
+    if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+      console.error('SMTP credentials not configured. SMTP_USER:', process.env.SMTP_USER ? 'SET' : 'NOT SET', 'SMTP_PASS:', process.env.SMTP_PASS ? 'SET' : 'NOT SET');
+      return NextResponse.json(
+        { error: 'Email service is not configured properly' },
+        { status: 500 }
+      );
+    }
+
+    const smtpPort = parseInt(process.env.SMTP_PORT || '465');
+    const isSecure = smtpPort === 465;
+
+    console.log('SMTP Configuration:', {
+      host: process.env.SMTP_HOST,
+      port: smtpPort,
+      secure: isSecure,
+      user: process.env.SMTP_USER,
+    });
+
+    // Create transporter with GoDaddy SMTP settings
+    // Using more permissive TLS options for cloud hosting compatibility
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST || 'smtpout.secureserver.net',
+      port: smtpPort,
+      secure: isSecure, // true for 465, false for 587
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+      tls: {
+        // Do not fail on invalid certificates (helps with some hosting providers)
+        rejectUnauthorized: false,
+        minVersion: 'TLSv1.2',
+      },
+      connectionTimeout: 10000, // 10 seconds
+      greetingTimeout: 10000,
+      socketTimeout: 15000,
+    });
+
+    // Verify SMTP connection
     try {
-        const body: ContactFormData = await request.json();
-        const { name, email, phone, message } = body;
+      await transporter.verify();
+      console.log('SMTP connection verified successfully');
+    } catch (verifyError) {
+      console.error('SMTP verification failed:', verifyError);
+      return NextResponse.json(
+        { error: 'Unable to connect to email server. Please try again later.' },
+        { status: 500 }
+      );
+    }
 
-        // Validate required fields
-        if (!name || !email || !message) {
-            return NextResponse.json(
-                { error: 'Name, email, and message are required' },
-                { status: 400 }
-            );
-        }
+    const timestamp = new Date().toLocaleString('en-IN', {
+      timeZone: 'Asia/Kolkata',
+      dateStyle: 'full',
+      timeStyle: 'short',
+    });
 
-        // Validate email format
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            return NextResponse.json(
-                { error: 'Invalid email format' },
-                { status: 400 }
-            );
-        }
-
-        // Create transporter with GoDaddy SMTP settings
-        const transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST || 'smtpout.secureserver.net',
-            port: parseInt(process.env.SMTP_PORT || '465'),
-            secure: true, // true for 465, false for 587
-            auth: {
-                user: process.env.SMTP_USER,
-                pass: process.env.SMTP_PASS,
-            },
-        });
-
-        const timestamp = new Date().toLocaleString('en-IN', {
-            timeZone: 'Asia/Kolkata',
-            dateStyle: 'full',
-            timeStyle: 'short',
-        });
-
-        // Email to SAJS Foundation (receiver)
-        const adminMailOptions = {
-            from: `"SAJS Foundation Website" <${process.env.SMTP_USER}>`,
-            to: process.env.CONTACT_EMAIL || process.env.SMTP_USER,
-            subject: `New Contact Form Submission from ${name}`,
-            html: `
+    // Email to SAJS Foundation (receiver)
+    const adminMailOptions = {
+      from: `"SAJS Foundation Website" <${process.env.SMTP_USER}>`,
+      to: process.env.CONTACT_EMAIL || process.env.SMTP_USER,
+      subject: `New Contact Form Submission from ${name}`,
+      html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <div style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); padding: 30px; border-radius: 10px 10px 0 0;">
             <h1 style="color: white; margin: 0; font-size: 24px;">New Contact Inquiry</h1>
@@ -84,7 +124,7 @@ export async function POST(request: NextRequest) {
           </div>
         </div>
       `,
-            text: `
+      text: `
 New Contact Form Submission
 
 Name: ${name}
@@ -94,14 +134,14 @@ Message: ${message}
 
 Submitted on: ${timestamp}
       `,
-        };
+    };
 
-        // Confirmation email to the user (sender)
-        const userMailOptions = {
-            from: `"SAJS Foundation" <${process.env.SMTP_USER}>`,
-            to: email,
-            subject: 'Thank you for contacting SAJS Foundation',
-            html: `
+    // Confirmation email to the user (sender)
+    const userMailOptions = {
+      from: `"SAJS Foundation" <${process.env.SMTP_USER}>`,
+      to: email,
+      subject: 'Thank you for contacting SAJS Foundation',
+      html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <div style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
             <h1 style="color: white; margin: 0; font-size: 24px;">Thank You!</h1>
@@ -129,7 +169,7 @@ Submitted on: ${timestamp}
           </div>
         </div>
       `,
-            text: `
+      text: `
 Dear ${name},
 
 Thank you for reaching out to SAJS Foundation! We have received your message and will get back to you within 24-48 hours.
@@ -144,23 +184,27 @@ SAJS Foundation Team
 📧 info@sajs.in
 🌐 https://sajs.in
       `,
-        };
+    };
 
-        // Send both emails
-        await Promise.all([
-            transporter.sendMail(adminMailOptions),
-            transporter.sendMail(userMailOptions),
-        ]);
+    // Send both emails
+    console.log('Sending emails...');
+    await Promise.all([
+      transporter.sendMail(adminMailOptions),
+      transporter.sendMail(userMailOptions),
+    ]);
+    console.log('Emails sent successfully');
 
-        return NextResponse.json(
-            { message: 'Email sent successfully' },
-            { status: 200 }
-        );
-    } catch (error) {
-        console.error('Error sending email:', error);
-        return NextResponse.json(
-            { error: 'Failed to send email. Please try again later.' },
-            { status: 500 }
-        );
-    }
+    return NextResponse.json(
+      { message: 'Email sent successfully' },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error('Error sending email:', error);
+    // Return more specific error message for debugging
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json(
+      { error: `Failed to send email: ${errorMessage}` },
+      { status: 500 }
+    );
+  }
 }
