@@ -10,7 +10,7 @@ import CallToAction from '@/components/ui/CallToAction';
 export const metadata: Metadata = {
   title: 'About Us - SAJS Foundation | Our Mission, Vision & Values',
   description: 'Learn about SAJS Foundation\'s journey, mission, and vision. Discover how we\'re empowering communities through education, healthcare, and sustainable development across India since 2010.',
-};
+}; 
 
 export default function AboutPage() {
   const jsonLd = {
